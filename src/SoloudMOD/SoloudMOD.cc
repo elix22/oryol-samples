@@ -52,7 +52,7 @@ SoloudMODApp::OnRunning() {
 
     float* buf = this->soloud.getWave();
     float* fft = this->soloud.calcFFT();
-    ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_Once);
     ImGui::Begin("MOD Player (MODs from SoLoud and modarchive.org)", nullptr, ImVec2(660, 400));
     for (int i = 0; i < NumMods; i++) {
         ImGui::PushID(i);
@@ -108,8 +108,9 @@ SoloudMODApp::OnInit() {
     ioSetup.FileSystems.Add("http", HTTPFileSystem::Creator());
     ioSetup.Assigns.Add("snd:", ORYOL_SAMPLE_URL);
     IO::Setup(ioSetup);
-
-    Gfx::Setup(GfxSetup::Window(800, 500, "SoLoud MOD Demo"));
+    auto gfxSetup = GfxSetup::Window(800, 500, "SoLoud MOD Demo");
+    gfxSetup.HtmlTrackElementSize = true;
+    Gfx::Setup(gfxSetup);
     Input::Setup();
     IMUI::Setup();
 

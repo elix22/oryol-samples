@@ -194,6 +194,7 @@ DrawCallExplorerApp::OnInit() {
     GfxSetup gfxSetup = GfxSetup::Window(620, 500, "Oryol DrawCallExplorer");
     gfxSetup.DefaultPassAction = PassAction::Clear(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
     gfxSetup.GlobalUniformBufferSize = 1024 * 1024 * 32;
+    gfxSetup.HtmlTrackElementSize = true;
     Gfx::Setup(gfxSetup);
     Input::Setup();
     IMUI::Setup();
@@ -247,8 +248,8 @@ DrawCallExplorerApp::OnCleanup() {
 void
 DrawCallExplorerApp::drawUI() {
     IMUI::NewFrame();
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(250, 160), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(250, 160), ImGuiCond_Once);
     if (ImGui::Begin("Controls")) {
         if (ImGui::Button("Reset")) {
             this->reset();
@@ -275,8 +276,8 @@ DrawCallExplorerApp::drawUI() {
         ImGui::PopItemWidth();
     }
     ImGui::End();
-    ImGui::SetNextWindowPos(ImVec2(10, 290), ImGuiSetCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(600, 200), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(10, 290), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(600, 200), ImGuiCond_Once);
     if (ImGui::Begin("Timing")) {
         const auto& s0 = this->samples[0];
         const auto& s1 = this->samples[(this->curSample-1) & (NumSamples-1)];

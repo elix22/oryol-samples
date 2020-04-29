@@ -119,7 +119,9 @@ FractalApp::OnRunning() {
 //------------------------------------------------------------------------------
 AppState::Code
 FractalApp::OnInit() {
-    Gfx::Setup(GfxSetup::Window(800, 512, "Fractal Sample"));
+    auto gfxSetup = GfxSetup::Window(800, 512, "Fractal Sample");
+    gfxSetup.HtmlTrackElementSize = true;
+    Gfx::Setup(gfxSetup);
     Gfx::Subscribe([this](const GfxEvent& event) {
         if (event.Type == GfxEvent::DisplayModified) {
             this->recreateRenderTargets(event.DisplayAttrs);
@@ -201,7 +203,7 @@ FractalApp::drawUI() {
     IMUI::NewFrame();
 
     // draw the controls window
-    ImGui::SetNextWindowPos(ImVec2(5, 5), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(5, 5), ImGuiCond_Once);
     ImGui::Begin("Controls", nullptr, ImVec2(300, 230));
     ImGui::BulletText("mouse-drag a rectangle to zoom in");
     ImGui::BulletText("click into Mandelbrot to render\nJulia set at that point");
@@ -250,7 +252,7 @@ FractalApp::drawUI() {
     }
 
     // handle dragging
-    if (!ImGui::IsMouseHoveringAnyWindow() && ImGui::IsMouseClicked(0)) {
+    if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && ImGui::IsMouseClicked(0)) {
         this->dragStarted = true;
         this->dragStartPos = ImGui::GetMousePos();
     }

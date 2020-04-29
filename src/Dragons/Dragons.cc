@@ -77,6 +77,7 @@ Dragons::OnInit() {
 
     this->gfxSetup = GfxSetup::WindowMSAA4(1024, 640, "Dragons");
     this->gfxSetup.DefaultPassAction = PassAction::Clear(glm::vec4(0.2f, 0.3f, 0.5f, 1.0f));
+    this->gfxSetup.HtmlTrackElementSize = true;
     Gfx::Setup(this->gfxSetup);
     AnimSetup animSetup;
     animSetup.MaxNumInstances = MaxNumInstances;
@@ -128,7 +129,7 @@ Dragons::OnInit() {
 //------------------------------------------------------------------------------
 AppState::Code
 Dragons::OnRunning() {
-    if (!ImGui::IsMouseHoveringAnyWindow()) {
+    if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
         this->camera.HandleInput();
     }
     this->camera.Center.z = -(this->numActiveInstances / 16) * 2.0f;
@@ -293,7 +294,7 @@ Dragons::updateNumInstances() {
 void
 Dragons::drawUI() {
     if (this->orbModel.IsValid) {
-        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
         if (ImGui::Begin("Dragons", nullptr)) {
             const int numBonesPerInst = Anim::Skeleton(this->orbModel.Skeleton).NumBones;
             const int numTrisPerInst = this->orbModel.MeshSetup.PrimitiveGroup(PrimGroupIndex).NumElements / 3;
@@ -311,8 +312,8 @@ Dragons::drawUI() {
         }
         ImGui::End();
         if (this->uiTextureWindowEnabled) {
-            ImGui::SetNextWindowPos(ImVec2(10, 220), ImGuiSetCond_Once);
-            ImGui::SetNextWindowSize(ImVec2(900, 400), ImGuiSetCond_Once);
+            ImGui::SetNextWindowPos(ImVec2(10, 220), ImGuiCond_Once);
+            ImGui::SetNextWindowSize(ImVec2(900, 400), ImGuiCond_Once);
             if (ImGui::Begin("Bone Texture", &this->uiTextureWindowEnabled)) {
                 ImGui::InputInt("##scale", &this->uiTexScale);
                 ImGui::SameLine();

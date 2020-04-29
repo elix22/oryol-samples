@@ -11,12 +11,9 @@ from mod import log, util, project, emscripten, android
 
 GitHubSamplesURL = 'https://github.com/floooh/oryol-samples/tree/master/src/'
 
-BuildEmscripten = True
-BuildWasm = True
 ExportAssets = True
 
-EmscConfig = 'webgl2-emsc-ninja-release'
-WasmConfig = 'webgl2-wasm-ninja-release'
+BuildConfig = 'webgl2-wasm-ninja-release'
 
 #-------------------------------------------------------------------------------
 def deploy_webpage(fips_dir, proj_dir, webpage_dir) :
@@ -28,7 +25,7 @@ def deploy_webpage(fips_dir, proj_dir, webpage_dir) :
         samples = yaml.load(f.read())
 
     # create directories
-    for platform in ['asmjs', 'wasm'] :
+    for platform in ['wasm'] :
         platform_dir = '{}/{}'.format(webpage_dir, platform)
         if not os.path.isdir(platform_dir) :
             os.makedirs(platform_dir)
@@ -53,15 +50,7 @@ def deploy_webpage(fips_dir, proj_dir, webpage_dir) :
                 imgFileName = tail
             content += '<div class="thumb">\n'
             content += '  <div class="thumb-title">{}</div>\n'.format(name)
-            content += '  <div class="img-frame"><a href="asmjs/{}.html"><img class="image" src="{}" title="{}"></img></a></div>\n'.format(name,imgFileName,desc)
-            content += '  <div class="thumb-bar">\n'
-            content += '    <ul class="thumb-list">\n'
-            if BuildEmscripten and 'emscripten' in types :
-                content += '      <li class="thumb-item"><a class="thumb-link" href="asmjs/{}.html">asm.js</a></li>\n'.format(name)
-            if BuildWasm and 'emscripten' in types :
-                content += '      <li class="thumb-item"><a class="thumb-link" href="wasm/{}.html">wasm</a></li>\n'.format(name)
-            content += '    </ul>\n'
-            content += '  </div>\n'
+            content += '  <div class="img-frame"><a href="wasm/{}.html"><img class="image" src="{}" title="{}"></img></a></div>\n'.format(name,imgFileName,desc)
             content += '</div>\n'
 
     # populate the html template, and write to the build directory
@@ -72,43 +61,21 @@ def deploy_webpage(fips_dir, proj_dir, webpage_dir) :
         f.write(html)
 
     # copy other required files
-    for name in ['style.css', 'dummy.jpg', 'emsc.js', 'wasm.js', 'about.html', 'favicon.png', 'core_samples.jpg'] :
+    for name in ['style.css', 'dummy.jpg', 'emsc.js', 'favicon.png', 'core_samples.jpg'] :
         log.info('> copy file: {}'.format(name))
         shutil.copy(proj_dir + '/web/' + name, webpage_dir + '/' + name)
 
-    # generate emscripten HTML pages
-    if BuildEmscripten and emscripten.check_exists(fips_dir) :
-        emsc_deploy_dir = '{}/fips-deploy/oryol-samples/{}'.format(ws_dir, EmscConfig)
-        for sample in samples :
-            name = sample['name']
-            if name != '__end__' and 'emscripten' in sample['type'] :
-                log.info('> generate emscripten HTML page: {}'.format(name))
-                for ext in ['js', 'html.mem'] :
-                    src_path = '{}/{}.{}'.format(emsc_deploy_dir, name, ext)
-                    if os.path.isfile(src_path) :
-                        shutil.copy(src_path, '{}/asmjs/'.format(webpage_dir))
-                with open(proj_dir + '/web/emsc.html', 'r') as f :
-                    templ = Template(f.read())
-                src_url = GitHubSamplesURL + sample['src'];
-                html = templ.safe_substitute(name=name, source=src_url)
-                with open('{}/asmjs/{}.html'.format(webpage_dir, name, name), 'w') as f :
-                    f.write(html)
-
     # generate WebAssembly HTML pages
-    if BuildWasm and emscripten.check_exists(fips_dir) :
-        wasm_deploy_dir = '{}/fips-deploy/oryol-samples/{}'.format(ws_dir, WasmConfig)
+    if emscripten.check_exists(fips_dir) :
+        wasm_deploy_dir = '{}/fips-deploy/oryol-samples/{}'.format(ws_dir, BuildConfig)
         for sample in samples :
             name = sample['name']
             if name != '__end__' and 'emscripten' in sample['type'] :
                 log.info('> generate wasm HTML page: {}'.format(name))
-                for ext in ['js', 'wasm.mappedGlobals'] :
+                for ext in ['js', 'wasm'] :
                     src_path = '{}/{}.{}'.format(wasm_deploy_dir, name, ext)
                     if os.path.isfile(src_path) :
                         shutil.copy(src_path, '{}/wasm/'.format(webpage_dir))
-                for ext in ['html.mem', 'wasm'] :
-                    src_path = '{}/{}.{}'.format(wasm_deploy_dir, name, ext)
-                    if os.path.isfile(src_path) :
-                        shutil.copy(src_path, '{}/wasm/{}.{}.txt'.format(webpage_dir, name, ext))
                 with open(proj_dir + '/web/wasm.html', 'r') as f :
                     templ = Template(f.read())
                 src_url = GitHubSamplesURL + sample['src'];
@@ -150,12 +117,9 @@ def build_deploy_webpage(fips_dir, proj_dir) :
         shutil.rmtree(webpage_dir)
     os.makedirs(webpage_dir)
 
-    if BuildEmscripten and emscripten.check_exists(fips_dir) :
-        project.gen(fips_dir, proj_dir, EmscConfig)
-        project.build(fips_dir, proj_dir, EmscConfig)
-    if BuildWasm and emscripten.check_exists(fips_dir) :
-        project.gen(fips_dir, proj_dir, WasmConfig)
-        project.build(fips_dir, proj_dir, WasmConfig)
+    if emscripten.check_exists(fips_dir) :
+        project.gen(fips_dir, proj_dir, BuildConfig)
+        project.build(fips_dir, proj_dir, BuildConfig)
     
     # export sample assets
     if ExportAssets :

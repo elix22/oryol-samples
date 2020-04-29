@@ -124,12 +124,13 @@ MeshViewerApp::OnInit() {
     auto gfxSetup = GfxSetup::WindowMSAA4(800, 512, "Oryol Mesh Viewer");
     gfxSetup.HighDPI = true;
     gfxSetup.DefaultPassAction = PassAction::Clear(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+    gfxSetup.HtmlTrackElementSize = true;
     Gfx::Setup(gfxSetup);
     Input::Setup();
     Input::SetPointerLockHandler([this] (const InputEvent& event) -> PointerLockMode::Code {
         if (event.Button == MouseButton::Left) {
             if (event.Type == InputEvent::MouseButtonDown) {
-                if (!ImGui::IsMouseHoveringAnyWindow()) {
+                if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
                     this->dragging = true;
                     return PointerLockMode::Enable;
                 }
@@ -224,7 +225,7 @@ MeshViewerApp::handleInput() {
 
     // rotate camera with mouse if not UI-dragging
     if (Input::TouchpadAttached()) {
-        if (!ImGui::IsMouseHoveringAnyWindow()) {
+        if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
             if (Input::TouchPanningStarted()) {
                 this->camera.startOrbital = this->camera.orbital;
             }
